@@ -1,24 +1,28 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../services/api";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import api from '../services/api';
 
-const allowedVotes = ["up-vote", "down-vote", "neutral-vote"];
+const allowedVotes = [
+  'up-vote',
+  'down-vote',
+  'neutral-vote',
+];
 
 function getVoteType(item, userId) {
   if (!item || userId == null) return null;
 
   if ((item.upVotesBy || []).some((id) => String(id) === String(userId))) {
-    return "up-vote";
+    return 'up-vote';
   }
 
   if ((item.downVotesBy || []).some((id) => String(id) === String(userId))) {
-    return "down-vote";
+    return 'down-vote';
   }
 
   return null;
 }
 
 function getEffectiveVoteType(currentVote, requestedVote) {
-  return currentVote === requestedVote ? "neutral-vote" : requestedVote;
+  return currentVote === requestedVote ? 'neutral-vote' : requestedVote;
 }
 
 function applyVoteLocally(item, userId, requestedVote) {
@@ -37,9 +41,9 @@ function applyVoteLocally(item, userId, requestedVote) {
     (id) => String(id) !== userIdString,
   );
 
-  if (effectiveVote === "up-vote") {
+  if (effectiveVote === 'up-vote') {
     upVotesBy.push(userId);
-  } else if (effectiveVote === "down-vote") {
+  } else if (effectiveVote === 'down-vote') {
     downVotesBy.push(userId);
   }
 
@@ -60,15 +64,13 @@ function captureVoteData(item) {
 }
 
 function captureVoteState(state, threadId, commentId = null) {
-  const detailMatches =
-    state.detail && String(state.detailId) === String(threadId);
+  const detailMatches = state.detail && String(state.detailId) === String(threadId);
 
-  const targetComment =
-    commentId !== null && detailMatches
-      ? state.detail.comments?.find(
-          (comment) => String(comment.id) === String(commentId),
-        )
-      : null;
+  const targetComment = commentId !== null && detailMatches
+    ? state.detail.comments?.find(
+      (comment) => String(comment.id) === String(commentId),
+    )
+    : null;
 
   const targetThread = state.items.find(
     (thread) => String(thread.id) === String(threadId),
@@ -83,54 +85,47 @@ function captureVoteState(state, threadId, commentId = null) {
 
 function restoreVoteState(state, threadId, snapshot, commentId = null) {
   if (
-    snapshot.detail &&
-    state.detail &&
-    String(state.detailId) === String(threadId)
+    snapshot.detail
+    && state.detail
+    && String(state.detailId) === String(threadId)
   ) {
     if (commentId === null) {
       state.detail.upVotesBy = [...snapshot.detail.upVotesBy];
       state.detail.downVotesBy = [...snapshot.detail.downVotesBy];
     } else if (snapshot.comment && Array.isArray(state.detail.comments)) {
-      state.detail.comments = state.detail.comments.map((comment) =>
-        String(comment.id) === String(commentId)
-          ? {
-              ...comment,
-              upVotesBy: [...snapshot.comment.upVotesBy],
-              downVotesBy: [...snapshot.comment.downVotesBy],
-            }
-          : comment,
-      );
+      state.detail.comments = state.detail.comments.map((comment) => (String(comment.id) === String(commentId)
+        ? {
+          ...comment,
+          upVotesBy: [...snapshot.comment.upVotesBy],
+          downVotesBy: [...snapshot.comment.downVotesBy],
+        }
+        : comment));
     }
   }
 
   if (commentId === null && snapshot.thread) {
-    state.items = state.items.map((thread) =>
-      String(thread.id) === String(threadId)
-        ? {
-            ...thread,
-            upVotesBy: [...snapshot.thread.upVotesBy],
-            downVotesBy: [...snapshot.thread.downVotesBy],
-          }
-        : thread,
-    );
+    state.items = state.items.map((thread) => (String(thread.id) === String(threadId)
+      ? {
+        ...thread,
+        upVotesBy: [...snapshot.thread.upVotesBy],
+        downVotesBy: [...snapshot.thread.downVotesBy],
+      }
+      : thread));
   }
 }
 
 export const fetchThreads = createAsyncThunk(
-  "threads/fetchThreads",
+  'threads/fetchThreads',
   async (_, { rejectWithValue }) => {
     try {
-      const [threadResponse, userResponse] = await Promise.all([
-        api.get("/threads"),
-        api.get("/users"),
-      ]);
+      const [threadResponse, userResponse] = await Promise.all([api.get('/threads'), api.get('/users')]);
 
-      const threads = threadResponse.threads;
-      const users = userResponse.users;
+      const { threads } = threadResponse;
+      const { users } = userResponse;
 
       if (!Array.isArray(threads) || !Array.isArray(users)) {
         return rejectWithValue(
-          "Format data thread atau pengguna dari API tidak sesuai.",
+          'Format data thread atau pengguna dari API tidak sesuai.',
         );
       }
 
@@ -141,30 +136,30 @@ export const fetchThreads = createAsyncThunk(
         owner: userMap.get(thread.ownerId) || null,
       }));
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal mengambil daftar thread.");
+      return rejectWithValue(error.message || 'Gagal mengambil daftar thread.');
     }
   },
   {
-    condition: (_, { getState }) => getState().threads.status === "idle",
+    condition: (_, { getState }) => getState().threads.status === 'idle',
   },
 );
 
 export const fetchThreadDetail = createAsyncThunk(
-  "threads/fetchThreadDetail",
+  'threads/fetchThreadDetail',
   async (threadId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/threads/${threadId}`);
-      const detailThread = response.detailThread;
+      const { detailThread } = response;
 
       if (!detailThread || !detailThread.id) {
         return rejectWithValue(
-          "Data detail thread tidak ditemukan pada respons API.",
+          'Data detail thread tidak ditemukan pada respons API.',
         );
       }
 
       return detailThread;
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal mengambil detail thread.");
+      return rejectWithValue(error.message || 'Gagal mengambil detail thread.');
     }
   },
   {
@@ -172,21 +167,21 @@ export const fetchThreadDetail = createAsyncThunk(
       const { detailId, detailStatus } = getState().threads;
 
       return !(
-        String(detailId) === String(threadId) &&
-        (detailStatus === "loading" || detailStatus === "succeeded")
+        String(detailId) === String(threadId)
+        && (detailStatus === 'loading' || detailStatus === 'succeeded')
       );
     },
   },
 );
 
 export const createThread = createAsyncThunk(
-  "threads/createThread",
+  'threads/createThread',
   async ({ title, body, category }, { getState, rejectWithValue }) => {
     try {
-      const token = getState().auth.token;
+      const { token } = getState().auth;
 
       if (!token) {
-        return rejectWithValue("Silakan login untuk membuat thread.");
+        return rejectWithValue('Silakan login untuk membuat thread.');
       }
 
       const payload = {
@@ -198,17 +193,17 @@ export const createThread = createAsyncThunk(
         payload.category = category.trim();
       }
 
-      const response = await api.post("/threads", payload, token);
+      const response = await api.post('/threads', payload, token);
 
       if (!response.thread) {
         return rejectWithValue(
-          "Respons API tidak berisi data thread yang dibuat.",
+          'Respons API tidak berisi data thread yang dibuat.',
         );
       }
 
       return response.thread;
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal membuat thread.");
+      return rejectWithValue(error.message || 'Gagal membuat thread.');
     }
   },
 );
@@ -219,7 +214,7 @@ async function submitVote(path, threadId, token) {
   const response = await api.get(`/threads/${threadId}`);
 
   if (!response.detailThread) {
-    throw new Error("Data detail thread tidak ditemukan setelah voting.");
+    throw new Error('Data detail thread tidak ditemukan setelah voting.');
   }
 
   return {
@@ -229,26 +224,25 @@ async function submitVote(path, threadId, token) {
 }
 
 export const voteOnThread = createAsyncThunk(
-  "threads/voteOnThread",
+  'threads/voteOnThread',
   async ({ threadId, voteType }, { getState, rejectWithValue }) => {
     try {
       const { token, user } = getState().auth;
       const state = getState().threads;
 
       if (!token || !user?.id) {
-        return rejectWithValue("Silakan login untuk memberikan vote.");
+        return rejectWithValue('Silakan login untuk memberikan vote.');
       }
 
       if (!allowedVotes.includes(voteType)) {
-        return rejectWithValue("Jenis vote tidak valid.");
+        return rejectWithValue('Jenis vote tidak valid.');
       }
 
-      const currentThread =
-        state.detail && String(state.detailId) === String(threadId)
-          ? state.detail
-          : state.items.find(
-              (thread) => String(thread.id) === String(threadId),
-            );
+      const currentThread = state.detail && String(state.detailId) === String(threadId)
+        ? state.detail
+        : state.items.find(
+          (thread) => String(thread.id) === String(threadId),
+        );
 
       const voteKey = `thread:${threadId}`;
       const snapshot = state.voteSnapshots[voteKey];
@@ -267,7 +261,7 @@ export const voteOnThread = createAsyncThunk(
         userId: user.id,
       };
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal memberikan vote.");
+      return rejectWithValue(error.message || 'Gagal memberikan vote.');
     }
   },
   {
@@ -279,26 +273,25 @@ export const voteOnThread = createAsyncThunk(
 );
 
 export const voteOnComment = createAsyncThunk(
-  "threads/voteOnComment",
+  'threads/voteOnComment',
   async ({ threadId, commentId, voteType }, { getState, rejectWithValue }) => {
     try {
       const { token, user } = getState().auth;
       const state = getState().threads;
 
       if (!token || !user?.id) {
-        return rejectWithValue("Silakan login untuk memberikan vote.");
+        return rejectWithValue('Silakan login untuk memberikan vote.');
       }
 
       if (!allowedVotes.includes(voteType)) {
-        return rejectWithValue("Jenis vote tidak valid.");
+        return rejectWithValue('Jenis vote tidak valid.');
       }
 
-      const currentComment =
-        state.detail && String(state.detailId) === String(threadId)
-          ? state.detail.comments?.find(
-              (comment) => String(comment.id) === String(commentId),
-            )
-          : null;
+      const currentComment = state.detail && String(state.detailId) === String(threadId)
+        ? state.detail.comments?.find(
+          (comment) => String(comment.id) === String(commentId),
+        )
+        : null;
 
       const voteKey = `comment:${threadId}:${commentId}`;
       const snapshot = state.voteSnapshots[voteKey];
@@ -318,7 +311,7 @@ export const voteOnComment = createAsyncThunk(
         commentId,
       };
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal memberikan vote.");
+      return rejectWithValue(error.message || 'Gagal memberikan vote.');
     }
   },
   {
@@ -330,13 +323,13 @@ export const voteOnComment = createAsyncThunk(
 );
 
 export const addComment = createAsyncThunk(
-  "threads/addComment",
+  'threads/addComment',
   async ({ threadId, content }, { getState, rejectWithValue }) => {
     try {
-      const token = getState().auth.token;
+      const { token } = getState().auth;
 
       if (!token) {
-        return rejectWithValue("Silakan login untuk menambahkan komentar.");
+        return rejectWithValue('Silakan login untuk menambahkan komentar.');
       }
 
       const response = await api.post(
@@ -346,7 +339,7 @@ export const addComment = createAsyncThunk(
       );
 
       if (!response.comment) {
-        return rejectWithValue("Respons API tidak berisi data komentar.");
+        return rejectWithValue('Respons API tidak berisi data komentar.');
       }
 
       return {
@@ -354,85 +347,83 @@ export const addComment = createAsyncThunk(
         comment: response.comment,
       };
     } catch (error) {
-      return rejectWithValue(error.message || "Gagal mengirim komentar.");
+      return rejectWithValue(error.message || 'Gagal mengirim komentar.');
     }
   },
 );
 
 const threadsSlice = createSlice({
-  name: "threads",
+  name: 'threads',
   initialState: {
     items: [],
-    status: "idle",
+    status: 'idle',
     error: null,
     detail: null,
     detailId: null,
-    detailStatus: "idle",
+    detailStatus: 'idle',
     detailError: null,
-    commentStatus: "idle",
+    commentStatus: 'idle',
     commentError: null,
-    voteStatus: "idle",
+    voteStatus: 'idle',
     voteError: null,
-    createStatus: "idle",
+    createStatus: 'idle',
     createError: null,
     pendingVotes: {},
     voteSnapshots: {},
   },
   reducers: {
     clearCommentStatus(state) {
-      state.commentStatus = "idle";
+      state.commentStatus = 'idle';
       state.commentError = null;
     },
     clearVoteStatus(state) {
-      state.voteStatus = "idle";
+      state.voteStatus = 'idle';
       state.voteError = null;
     },
     clearCreateStatus(state) {
-      state.createStatus = "idle";
+      state.createStatus = 'idle';
       state.createError = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchThreads.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
         state.error = null;
       })
       .addCase(fetchThreads.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.items = action.payload;
       })
       .addCase(fetchThreads.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
-          action.payload || "Terjadi kesalahan saat mengambil thread.";
+        state.status = 'failed';
+        state.error = action.payload || 'Terjadi kesalahan saat mengambil thread.';
       })
       .addCase(fetchThreadDetail.pending, (state, action) => {
-        state.detailStatus = "loading";
+        state.detailStatus = 'loading';
         state.detailError = null;
         state.detailId = action.meta.arg;
         state.detail = null;
-        state.commentStatus = "idle";
+        state.commentStatus = 'idle';
         state.commentError = null;
-        state.voteStatus = "idle";
+        state.voteStatus = 'idle';
         state.voteError = null;
       })
       .addCase(fetchThreadDetail.fulfilled, (state, action) => {
-        state.detailStatus = "succeeded";
+        state.detailStatus = 'succeeded';
         state.detail = action.payload;
         state.detailId = action.payload.id;
       })
       .addCase(fetchThreadDetail.rejected, (state, action) => {
-        state.detailStatus = "failed";
-        state.detailError =
-          action.payload || "Terjadi kesalahan saat mengambil detail thread.";
+        state.detailStatus = 'failed';
+        state.detailError = action.payload || 'Terjadi kesalahan saat mengambil detail thread.';
       })
       .addCase(createThread.pending, (state) => {
-        state.createStatus = "loading";
+        state.createStatus = 'loading';
         state.createError = null;
       })
       .addCase(createThread.fulfilled, (state, action) => {
-        state.createStatus = "succeeded";
+        state.createStatus = 'succeeded';
 
         const newThread = action.payload;
         const exists = state.items.some((thread) => thread.id === newThread.id);
@@ -446,23 +437,22 @@ const threadsSlice = createSlice({
         }
       })
       .addCase(createThread.rejected, (state, action) => {
-        state.createStatus = "failed";
-        state.createError =
-          action.payload || "Terjadi kesalahan saat membuat thread.";
+        state.createStatus = 'failed';
+        state.createError = action.payload || 'Terjadi kesalahan saat membuat thread.';
       })
       .addCase(addComment.pending, (state) => {
-        state.commentStatus = "loading";
+        state.commentStatus = 'loading';
         state.commentError = null;
       })
       .addCase(addComment.fulfilled, (state, action) => {
-        state.commentStatus = "succeeded";
+        state.commentStatus = 'succeeded';
 
         const { threadId, comment } = action.payload;
 
         if (
-          state.detail &&
-          String(state.detailId) === String(threadId) &&
-          Array.isArray(state.detail.comments)
+          state.detail
+          && String(state.detailId) === String(threadId)
+          && Array.isArray(state.detail.comments)
         ) {
           const exists = state.detail.comments.some(
             (item) => item.id === comment.id,
@@ -474,33 +464,29 @@ const threadsSlice = createSlice({
           }
         }
 
-        state.items = state.items.map((thread) =>
-          String(thread.id) === String(threadId)
-            ? {
-                ...thread,
-                totalComments: (thread.totalComments || 0) + 1,
-              }
-            : thread,
-        );
+        state.items = state.items.map((thread) => (String(thread.id) === String(threadId)
+          ? {
+            ...thread,
+            totalComments: (thread.totalComments || 0) + 1,
+          }
+          : thread));
       })
       .addCase(addComment.rejected, (state, action) => {
-        state.commentStatus = "failed";
-        state.commentError =
-          action.payload || "Terjadi kesalahan saat mengirim komentar.";
+        state.commentStatus = 'failed';
+        state.commentError = action.payload || 'Terjadi kesalahan saat mengirim komentar.';
       })
       .addCase(voteOnThread.pending, (state, action) => {
         const { threadId, userId } = action.meta.arg;
         const key = `thread:${threadId}`;
 
-        state.voteStatus = "loading";
+        state.voteStatus = 'loading';
         state.voteError = null;
         state.pendingVotes[key] = action.meta.requestId;
 
         if (userId != null) {
           state.voteSnapshots[key] = captureVoteState(state, threadId);
 
-          const detailMatches =
-            state.detail && String(state.detailId) === String(threadId);
+          const detailMatches = state.detail && String(state.detailId) === String(threadId);
 
           if (detailMatches) {
             state.detail = applyVoteLocally(
@@ -510,11 +496,9 @@ const threadsSlice = createSlice({
             );
           }
 
-          state.items = state.items.map((thread) =>
-            String(thread.id) === String(threadId)
-              ? applyVoteLocally(thread, userId, action.meta.arg.voteType)
-              : thread,
-          );
+          state.items = state.items.map((thread) => (String(thread.id) === String(threadId)
+            ? applyVoteLocally(thread, userId, action.meta.arg.voteType)
+            : thread));
         }
       })
       .addCase(voteOnThread.fulfilled, (state, action) => {
@@ -523,7 +507,7 @@ const threadsSlice = createSlice({
 
         if (state.pendingVotes[key] !== action.meta.requestId) return;
 
-        state.voteStatus = "succeeded";
+        state.voteStatus = 'succeeded';
         delete state.pendingVotes[key];
         delete state.voteSnapshots[key];
 
@@ -531,15 +515,13 @@ const threadsSlice = createSlice({
           state.detail = detailThread;
         }
 
-        state.items = state.items.map((thread) =>
-          String(thread.id) === String(threadId)
-            ? {
-                ...thread,
-                upVotesBy: detailThread.upVotesBy || [],
-                downVotesBy: detailThread.downVotesBy || [],
-              }
-            : thread,
-        );
+        state.items = state.items.map((thread) => (String(thread.id) === String(threadId)
+          ? {
+            ...thread,
+            upVotesBy: detailThread.upVotesBy || [],
+            downVotesBy: detailThread.downVotesBy || [],
+          }
+          : thread));
       })
       .addCase(voteOnThread.rejected, (state, action) => {
         const { threadId } = action.meta.arg;
@@ -547,9 +529,8 @@ const threadsSlice = createSlice({
 
         if (state.pendingVotes[key] !== action.meta.requestId) return;
 
-        state.voteStatus = "failed";
-        state.voteError =
-          action.payload || "Terjadi kesalahan saat memberikan vote.";
+        state.voteStatus = 'failed';
+        state.voteError = action.payload || 'Terjadi kesalahan saat memberikan vote.';
 
         const snapshot = state.voteSnapshots[key];
         if (snapshot) {
@@ -563,7 +544,7 @@ const threadsSlice = createSlice({
         const { threadId, commentId, userId } = action.meta.arg;
         const key = `comment:${threadId}:${commentId}`;
 
-        state.voteStatus = "loading";
+        state.voteStatus = 'loading';
         state.voteError = null;
         state.pendingVotes[key] = action.meta.requestId;
 
@@ -575,15 +556,13 @@ const threadsSlice = createSlice({
           );
 
           if (
-            state.detail &&
-            String(state.detailId) === String(threadId) &&
-            Array.isArray(state.detail.comments)
+            state.detail
+            && String(state.detailId) === String(threadId)
+            && Array.isArray(state.detail.comments)
           ) {
-            state.detail.comments = state.detail.comments.map((comment) =>
-              String(comment.id) === String(commentId)
-                ? applyVoteLocally(comment, userId, action.meta.arg.voteType)
-                : comment,
-            );
+            state.detail.comments = state.detail.comments.map((comment) => (String(comment.id) === String(commentId)
+              ? applyVoteLocally(comment, userId, action.meta.arg.voteType)
+              : comment));
           }
         }
       })
@@ -593,7 +572,7 @@ const threadsSlice = createSlice({
 
         if (state.pendingVotes[key] !== action.meta.requestId) return;
 
-        state.voteStatus = "succeeded";
+        state.voteStatus = 'succeeded';
         delete state.pendingVotes[key];
         delete state.voteSnapshots[key];
 
@@ -601,15 +580,13 @@ const threadsSlice = createSlice({
           state.detail = detailThread;
         }
 
-        state.items = state.items.map((thread) =>
-          String(thread.id) === String(threadId)
-            ? {
-                ...thread,
-                upVotesBy: detailThread.upVotesBy || [],
-                downVotesBy: detailThread.downVotesBy || [],
-              }
-            : thread,
-        );
+        state.items = state.items.map((thread) => (String(thread.id) === String(threadId)
+          ? {
+            ...thread,
+            upVotesBy: detailThread.upVotesBy || [],
+            downVotesBy: detailThread.downVotesBy || [],
+          }
+          : thread));
       })
       .addCase(voteOnComment.rejected, (state, action) => {
         const { threadId, commentId } = action.meta.arg;
@@ -617,9 +594,8 @@ const threadsSlice = createSlice({
 
         if (state.pendingVotes[key] !== action.meta.requestId) return;
 
-        state.voteStatus = "failed";
-        state.voteError =
-          action.payload || "Terjadi kesalahan saat memberikan vote.";
+        state.voteStatus = 'failed';
+        state.voteError = action.payload || 'Terjadi kesalahan saat memberikan vote.';
 
         const snapshot = state.voteSnapshots[key];
         if (snapshot) {
@@ -632,7 +608,6 @@ const threadsSlice = createSlice({
   },
 });
 
-export const { clearCommentStatus, clearVoteStatus, clearCreateStatus } =
-  threadsSlice.actions;
+export const { clearCommentStatus, clearVoteStatus, clearCreateStatus } = threadsSlice.actions;
 
 export default threadsSlice.reducer;

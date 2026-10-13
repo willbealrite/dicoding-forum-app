@@ -1,17 +1,16 @@
-
-import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { clearAuthError, registerUser } from "../states/authSlice";
+import { useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearAuthError, registerUser } from '../states/authSlice';
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error, token } = useSelector((state) => state.auth);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,7 +25,7 @@ function RegisterPage() {
         }),
       ).unwrap();
 
-      navigate("/login", { replace: true });
+      navigate('/login', { replace: true });
     } catch {
       // Pesan error ditampilkan dari Redux Store.
     }
@@ -108,14 +107,16 @@ function RegisterPage() {
           <button
             className="auth-submit"
             type="submit"
-            disabled={status === "loading"}
+            disabled={status === 'loading'}
           >
-            {status === "loading" ? "Mendaftarkan..." : "Buat Akun"}
+            {status === 'loading' ? 'Mendaftarkan...' : 'Buat Akun'}
           </button>
         </form>
 
         <p className="auth-footer">
-          Sudah punya akun? <Link to="/login">Login</Link>
+          Sudah punya akun?
+          {' '}
+          <Link to="/login">Login</Link>
         </p>
 
         <Link className="auth-back-link" to="/">

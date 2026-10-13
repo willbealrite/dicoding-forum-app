@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 import {
   Link,
   Navigate,
@@ -6,12 +6,12 @@ import {
   Routes,
   useNavigate,
   useParams,
-} from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import LeaderboardPage from "./pages/LeaderboardPage";
-import { fetchOwnProfile, logoutUser } from "./states/authSlice";
+} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import { fetchOwnProfile, logoutUser } from './states/authSlice';
 import {
   addComment,
   clearCommentStatus,
@@ -22,34 +22,34 @@ import {
   fetchThreadDetail,
   voteOnComment,
   voteOnThread,
-} from "./states/threadsSlice";
+} from './states/threadsSlice';
 
 function stripHtml(html) {
-  if (!html) return "";
+  if (!html) return '';
 
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
 }
 
 function formatDate(dateString) {
-  if (!dateString) return "Waktu tidak tersedia";
+  if (!dateString) return 'Waktu tidak tersedia';
 
   const date = new Date(dateString);
 
   if (Number.isNaN(date.getTime())) {
-    return "Waktu tidak tersedia";
+    return 'Waktu tidak tersedia';
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  return new Intl.DateTimeFormat('id-ID', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   }).format(date);
 }
 
-function UserAvatar({ user, size = "medium" }) {
+function UserAvatar({ user, size = 'medium' }) {
   const [failedAvatarUrl, setFailedAvatarUrl] = useState(null);
-  const name = user?.name?.trim() || "Pengguna";
-  const initial = name.charAt(0).toUpperCase() || "?";
+  const name = user?.name?.trim() || 'Pengguna';
+  const initial = name.charAt(0).toUpperCase() || '?';
   const avatarUrl = user?.avatar;
 
   if (avatarUrl && failedAvatarUrl !== avatarUrl) {
@@ -82,7 +82,7 @@ function MainNavigation() {
 
   function handleLogout() {
     dispatch(logoutUser());
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   }
 
   return (
@@ -92,7 +92,7 @@ function MainNavigation() {
 
       {token ? (
         <div className="navigation-user">
-          <span>{user?.name ? `Halo, ${user.name}` : "Sudah login"}</span>
+          <span>{user?.name ? `Halo, ${user.name}` : 'Sudah login'}</span>
           <button type="button" onClick={handleLogout}>
             Logout
           </button>
@@ -126,29 +126,33 @@ function VoteControls({
     <div className="vote-controls" aria-label="Voting">
       <button
         type="button"
-        className={hasUpvoted ? "vote-button active" : "vote-button"}
+        className={hasUpvoted ? 'vote-button active' : 'vote-button'}
         aria-pressed={hasUpvoted}
         disabled={disabled}
-        onClick={() => onVote("up-vote")}
+        onClick={() => onVote('up-vote')}
       >
-        ▲ {upVotesBy.length}
+        ▲
+        {' '}
+        {upVotesBy.length}
       </button>
 
       <button
         type="button"
-        className={hasDownvoted ? "vote-button active" : "vote-button"}
+        className={hasDownvoted ? 'vote-button active' : 'vote-button'}
         aria-pressed={hasDownvoted}
         disabled={disabled}
-        onClick={() => onVote("down-vote")}
+        onClick={() => onVote('down-vote')}
       >
-        ▼ {downVotesBy.length}
+        ▼
+        {' '}
+        {downVotesBy.length}
       </button>
 
       <button
         type="button"
         className="vote-button"
         disabled={disabled || (!hasUpvoted && !hasDownvoted)}
-        onClick={() => onVote("neutral-vote")}
+        onClick={() => onVote('neutral-vote')}
       >
         Netral
       </button>
@@ -161,45 +165,49 @@ function HomePage() {
   const navigate = useNavigate();
 
   const { user, token } = useSelector((state) => state.auth);
-  const { items, status, error, createStatus, createError } = useSelector(
+  const {
+    items, status, error, createStatus, createError,
+  } = useSelector(
     (state) => state.threads,
   );
 
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [category, setCategory] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [category, setCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     if (token && !user) dispatch(fetchOwnProfile());
-  }, [dispatch, token, user]);
+  }, [
+    dispatch,
+    token,
+    user,
+  ]);
 
   useEffect(() => {
-    if (status === "idle") dispatch(fetchThreads());
+    if (status === 'idle') dispatch(fetchThreads());
   }, [dispatch, status]);
 
   const categories = useMemo(() => {
     const uniqueCategories = new Set();
 
     items.forEach((thread) => {
-      const threadCategory =
-        typeof thread.category === "string" ? thread.category.trim() : "";
+      const threadCategory = typeof thread.category === 'string' ? thread.category.trim() : '';
 
       if (threadCategory) {
         uniqueCategories.add(threadCategory);
       }
     });
 
-    return [...uniqueCategories].sort((a, b) => a.localeCompare(b, "id"));
+    return [...uniqueCategories].sort((a, b) => a.localeCompare(b, 'id'));
   }, [items]);
 
   const filteredThreads = useMemo(() => {
-    if (selectedCategory === "all") return items;
+    if (selectedCategory === 'all') return items;
 
     return items.filter(
-      (thread) =>
-        typeof thread.category === "string" &&
-        thread.category.trim() === selectedCategory,
+      (thread) => typeof thread.category === 'string'
+        && thread.category.trim() === selectedCategory,
     );
   }, [items, selectedCategory]);
 
@@ -209,7 +217,7 @@ function HomePage() {
     const trimmedTitle = title.trim();
     const trimmedBody = body.trim();
 
-    if (!trimmedTitle || !trimmedBody || createStatus === "loading") return;
+    if (!trimmedTitle || !trimmedBody || createStatus === 'loading') return;
 
     try {
       const newThread = await dispatch(
@@ -220,9 +228,9 @@ function HomePage() {
         }),
       ).unwrap();
 
-      setTitle("");
-      setBody("");
-      setCategory("");
+      setTitle('');
+      setBody('');
+      setCategory('');
       dispatch(clearCreateStatus());
 
       if (newThread?.id) navigate(`/threads/${newThread.id}`);
@@ -235,7 +243,7 @@ function HomePage() {
     return (event) => {
       setValue(event.target.value);
 
-      if (createStatus !== "idle") {
+      if (createStatus !== 'idle') {
         dispatch(clearCreateStatus());
       }
     };
@@ -250,8 +258,8 @@ function HomePage() {
 
       <p>
         {token
-          ? `Selamat datang, ${user?.name || "pengguna"}!`
-          : "Selamat datang di forum diskusi."}
+          ? `Selamat datang, ${user?.name || 'pengguna'}!`
+          : 'Selamat datang di forum diskusi.'}
       </p>
 
       <section
@@ -295,26 +303,30 @@ function HomePage() {
               maxLength={50}
             />
 
-            {createStatus === "failed" ? (
+            {createStatus === 'failed' ? (
               <p className="thread-error" role="alert">
-                Gagal membuat thread: {createError}
+                Gagal membuat thread:
+                {' '}
+                {createError}
               </p>
             ) : null}
 
             <button
               type="submit"
               disabled={
-                !title.trim() || !body.trim() || createStatus === "loading"
+                !title.trim() || !body.trim() || createStatus === 'loading'
               }
             >
-              {createStatus === "loading"
-                ? "Menerbitkan diskusi..."
-                : "Terbitkan Diskusi"}
+              {createStatus === 'loading'
+                ? 'Menerbitkan diskusi...'
+                : 'Terbitkan Diskusi'}
             </button>
           </form>
         ) : (
           <p className="thread-feedback">
-            <Link to="/login">Login</Link> untuk membuat diskusi baru.
+            <Link to="/login">Login</Link>
+            {' '}
+            untuk membuat diskusi baru.
           </p>
         )}
       </section>
@@ -341,42 +353,44 @@ function HomePage() {
             ))}
           </select>
 
-          {selectedCategory !== "all" ? (
+          {selectedCategory !== 'all' ? (
             <button
               type="button"
               className="category-reset-button"
-              onClick={() => setSelectedCategory("all")}
+              onClick={() => setSelectedCategory('all')}
             >
               Reset filter
             </button>
           ) : null}
         </div>
 
-        {status === "idle" || status === "loading" ? (
+        {status === 'idle' || status === 'loading' ? (
           <p className="thread-feedback" role="status">
             Memuat diskusi...
           </p>
         ) : null}
 
-        {status === "failed" ? (
+        {status === 'failed' ? (
           <p className="thread-error" role="alert">
-            Gagal memuat diskusi: {error}
+            Gagal memuat diskusi:
+            {' '}
+            {error}
           </p>
         ) : null}
 
-        {status === "succeeded" && items.length === 0 ? (
+        {status === 'succeeded' && items.length === 0 ? (
           <p className="thread-feedback">Belum ada thread diskusi.</p>
         ) : null}
 
-        {status === "succeeded" &&
-        items.length > 0 &&
-        filteredThreads.length === 0 ? (
-          <p className="thread-feedback">
-            Tidak ada diskusi dalam kategori ini.
-          </p>
-        ) : null}
+        {status === 'succeeded'
+        && items.length > 0
+        && filteredThreads.length === 0 ? (
+            <p className="thread-feedback">
+              Tidak ada diskusi dalam kategori ini.
+            </p>
+          ) : null}
 
-        {status === "succeeded" && filteredThreads.length > 0 ? (
+        {status === 'succeeded' && filteredThreads.length > 0 ? (
           <div className="thread-list">
             {filteredThreads.map((thread) => {
               const bodyText = stripHtml(thread.body);
@@ -408,10 +422,16 @@ function HomePage() {
 
                   <div className="thread-meta">
                     <span>
-                      Oleh: {thread.owner?.name || "Pengguna tidak diketahui"}
+                      Oleh:
+                      {' '}
+                      {thread.owner?.name || 'Pengguna tidak diketahui'}
                     </span>
                     <span>{formatDate(thread.createdAt)}</span>
-                    <span>{thread.totalComments ?? 0} komentar</span>
+                    <span>
+                      {thread.totalComments ?? 0}
+                      {' '}
+                      komentar
+                    </span>
                   </div>
 
                   <Link
@@ -433,7 +453,7 @@ function HomePage() {
 function ThreadDetailPage() {
   const { threadId } = useParams();
   const dispatch = useDispatch();
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState('');
 
   const { token, user } = useSelector((state) => state.auth);
   const {
@@ -453,7 +473,11 @@ function ThreadDetailPage() {
 
   useEffect(() => {
     if (token && !user) dispatch(fetchOwnProfile());
-  }, [dispatch, token, user]);
+  }, [
+    dispatch,
+    token,
+    user,
+  ]);
 
   const isCurrentThread = detail && String(detailId) === threadId;
 
@@ -462,24 +486,19 @@ function ThreadDetailPage() {
 
     const trimmedContent = content.trim();
 
-    if (!trimmedContent || commentStatus === "loading") return;
+    if (!trimmedContent || commentStatus === 'loading') return;
 
     try {
       await dispatch(
         addComment({ threadId, content: trimmedContent }),
       ).unwrap();
-      setContent("");
+      setContent('');
     } catch {
       // Pesan error disediakan oleh Redux.
     }
   }
 
   async function handleThreadVote(voteType) {
-    console.log("Vote diklik:", voteType);
-    console.log("User tersedia:", Boolean(user));
-    console.log("User ID tersedia:", Boolean(user?.id));
-    console.log("Token tersedia:", Boolean(token));
-
     if (!token || !user?.id) return;
 
     dispatch(clearVoteStatus());
@@ -488,9 +507,8 @@ function ThreadDetailPage() {
       await dispatch(
         voteOnThread({ threadId, voteType, userId: user.id }),
       ).unwrap();
-      console.log("Vote berhasil");
-    } catch (error) {
-      console.error("Vote gagal:", error);
+    } catch {
+      // Pesan error disediakan oleh Redux.
     }
   }
 
@@ -514,8 +532,8 @@ function ThreadDetailPage() {
   }
 
   if (
-    detailStatus === "idle" ||
-    (detailStatus === "loading" && !isCurrentThread)
+    detailStatus === 'idle'
+    || (detailStatus === 'loading' && !isCurrentThread)
   ) {
     return (
       <main className="home-placeholder">
@@ -527,12 +545,14 @@ function ThreadDetailPage() {
     );
   }
 
-  if (detailStatus === "failed" && !isCurrentThread) {
+  if (detailStatus === 'failed' && !isCurrentThread) {
     return (
       <main className="home-placeholder">
         <MainNavigation />
         <p className="thread-error" role="alert">
-          Gagal memuat detail diskusi: {detailError}
+          Gagal memuat detail diskusi:
+          {' '}
+          {detailError}
         </p>
         <Link to="/">Kembali ke daftar diskusi</Link>
       </main>
@@ -568,7 +588,7 @@ function ThreadDetailPage() {
           <UserAvatar user={detail.owner} />
           <div className="thread-author-info">
             <span className="thread-author-name">
-              {detail.owner?.name || "Pengguna tidak diketahui"}
+              {detail.owner?.name || 'Pengguna tidak diketahui'}
             </span>
             <span className="thread-author-date">
               {formatDate(detail.createdAt)}
@@ -577,32 +597,40 @@ function ThreadDetailPage() {
         </div>
 
         <div className="thread-detail-body">
-          {stripHtml(detail.body) || "Thread ini tidak memiliki isi."}
+          {stripHtml(detail.body) || 'Thread ini tidak memiliki isi.'}
         </div>
 
         <VoteControls
           upVotesBy={detail.upVotesBy || []}
           downVotesBy={detail.downVotesBy || []}
           userId={user?.id}
-          disabled={!token || voteStatus === "loading"}
+          disabled={!token || voteStatus === 'loading'}
           onVote={handleThreadVote}
         />
 
         {!token ? (
           <p className="thread-feedback">
-            <Link to="/login">Login</Link> untuk memberikan vote.
+            <Link to="/login">Login</Link>
+            {' '}
+            untuk memberikan vote.
           </p>
         ) : null}
       </article>
 
-      {voteStatus === "failed" ? (
+      {voteStatus === 'failed' ? (
         <p className="thread-error" role="alert">
-          Gagal memberikan vote: {voteError}
+          Gagal memberikan vote:
+          {' '}
+          {voteError}
         </p>
       ) : null}
 
       <section className="comments-section" aria-labelledby="comments-heading">
-        <h2 id="comments-heading">Komentar ({comments.length})</h2>
+        <h2 id="comments-heading">
+          Komentar (
+          {comments.length}
+          )
+        </h2>
 
         {comments.length === 0 ? (
           <p className="thread-feedback">Belum ada komentar.</p>
@@ -616,7 +644,7 @@ function ThreadDetailPage() {
                   <UserAvatar user={comment.owner} size="small" />
                   <div className="comment-author-info">
                     <span className="thread-author-name">
-                      {comment.owner?.name || "Pengguna tidak diketahui"}
+                      {comment.owner?.name || 'Pengguna tidak diketahui'}
                     </span>
                     <span className="thread-author-date">
                       {formatDate(comment.createdAt)}
@@ -628,7 +656,7 @@ function ThreadDetailPage() {
                   upVotesBy={comment.upVotesBy || []}
                   downVotesBy={comment.downVotesBy || []}
                   userId={user?.id}
-                  disabled={!token || voteStatus === "loading"}
+                  disabled={!token || voteStatus === 'loading'}
                   onVote={(voteType) => handleCommentVote(comment.id, voteType)}
                 />
               </article>
@@ -649,8 +677,8 @@ function ThreadDetailPage() {
                 setContent(event.target.value);
 
                 if (
-                  commentStatus === "failed" ||
-                  commentStatus === "succeeded"
+                  commentStatus === 'failed'
+                  || commentStatus === 'succeeded'
                 ) {
                   dispatch(clearCommentStatus());
                 }
@@ -661,13 +689,13 @@ function ThreadDetailPage() {
               required
             />
 
-            {commentStatus === "failed" ? (
+            {commentStatus === 'failed' ? (
               <p className="thread-error" role="alert">
                 {commentError}
               </p>
             ) : null}
 
-            {commentStatus === "succeeded" ? (
+            {commentStatus === 'succeeded' ? (
               <p className="thread-success" role="status">
                 Komentar berhasil dikirim.
               </p>
@@ -675,14 +703,16 @@ function ThreadDetailPage() {
 
             <button
               type="submit"
-              disabled={!content.trim() || commentStatus === "loading"}
+              disabled={!content.trim() || commentStatus === 'loading'}
             >
-              {commentStatus === "loading" ? "Mengirim..." : "Kirim komentar"}
+              {commentStatus === 'loading' ? 'Mengirim...' : 'Kirim komentar'}
             </button>
           </form>
         ) : (
           <p className="thread-feedback">
-            <Link to="/login">Login</Link> untuk menambahkan komentar.
+            <Link to="/login">Login</Link>
+            {' '}
+            untuk menambahkan komentar.
           </p>
         )}
       </section>

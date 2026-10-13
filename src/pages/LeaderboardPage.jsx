@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchLeaderboards } from "../states/leaderboardsSlice";
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchLeaderboards } from '../states/leaderboardsSlice';
 
 function LeaderboardPage() {
   const dispatch = useDispatch();
   const { items, status, error } = useSelector((state) => state.leaderboards);
 
   useEffect(() => {
-    if (status === "idle") {
+    if (status === 'idle') {
       dispatch(fetchLeaderboards());
     }
   }, [dispatch, status]);
@@ -26,16 +26,18 @@ function LeaderboardPage() {
       <h1>Leaderboard</h1>
       <p>Pengguna dengan skor tertinggi di forum diskusi.</p>
 
-      {status === "idle" || status === "loading" ? (
+      {status === 'idle' || status === 'loading' ? (
         <p className="thread-feedback" role="status">
           Memuat leaderboard...
         </p>
       ) : null}
 
-      {status === "failed" ? (
+      {status === 'failed' ? (
         <div>
           <p className="thread-error" role="alert">
-            Gagal memuat leaderboard: {error}
+            Gagal memuat leaderboard:
+            {' '}
+            {error}
           </p>
           <button type="button" onClick={() => dispatch(fetchLeaderboards())}>
             Coba lagi
@@ -43,19 +45,19 @@ function LeaderboardPage() {
         </div>
       ) : null}
 
-      {status === "succeeded" && items.length === 0 ? (
+      {status === 'succeeded' && items.length === 0 ? (
         <p className="thread-feedback">Belum ada data leaderboard.</p>
       ) : null}
 
-      {status === "succeeded" && items.length > 0 ? (
+      {status === 'succeeded' && items.length > 0 ? (
         <section
           className="leaderboard-list"
           aria-label="Daftar peringkat pengguna"
         >
           {items.map((entry, index) => {
-            const name = entry.user?.name || "Pengguna";
+            const name = entry.user?.name || 'Pengguna';
             const avatar = entry.user?.avatar;
-            const initial = name.trim().charAt(0).toUpperCase() || "?";
+            const initial = name.trim().charAt(0).toUpperCase() || '?';
 
             return (
               <article
@@ -77,7 +79,7 @@ function LeaderboardPage() {
                 ) : null}
 
                 <span
-                  className={`user-avatar user-avatar-fallback${avatar ? " leaderboard-avatar-fallback" : ""}`}
+                  className={`user-avatar user-avatar-fallback${avatar ? ' leaderboard-avatar-fallback' : ''}`}
                   role="img"
                   aria-label={`Avatar ${name}`}
                   hidden={Boolean(avatar)}
@@ -88,7 +90,9 @@ function LeaderboardPage() {
                 <span className="leaderboard-name">{name}</span>
 
                 <span className="leaderboard-score">
-                  {entry.score ?? 0} poin
+                  {entry.score ?? 0}
+                  {' '}
+                  poin
                 </span>
               </article>
             );
