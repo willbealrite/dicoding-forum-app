@@ -167,7 +167,7 @@
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -4.5px;
     border: 5px solid transparent;
@@ -181,4 +181,375 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+.thread-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.thread-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.thread-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.thread-card {
+  padding: 1.25rem;
+  border: 1px solid #454545;
+  border-radius: 12px;
+  background: #292929;
+  overflow-wrap: anywhere;
+}
+
+.thread-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.thread-body {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  color: #b8b8b8;
+  font-size: 0.85rem;
+}
+
+.thread-feedback,
+.thread-error {
+  padding: 1rem;
+  border-radius: 8px;
+  background: #292929;
+}
+
+.thread-error {
+  color: #ffaaaa;
+}
+
+.thread-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.thread-title-link:hover {
+  text-decoration: underline;
+}
+
+.thread-detail-link,
+.back-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #a9c8ff;
+  text-decoration: none;
+}
+
+.thread-detail-link:hover,
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.thread-detail,
+.comment-card {
+  padding: 1.25rem;
+  border: 1px solid #454545;
+  border-radius: 12px;
+  background: #292929;
+}
+
+.thread-detail h1 {
+  overflow-wrap: anywhere;
+}
+
+.thread-detail-body {
+  margin-top: 1.5rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comments-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.comments-section h2 {
+  margin-bottom: 1rem;
+}
+
+.comment-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.comment-content {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.comment-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #454545;
+  border-radius: 12px;
+  background: #292929;
+  text-align: left;
+}
+
+.comment-form h3 {
+  margin: 0;
+}
+
+.comment-form label {
+  font-weight: 600;
+}
+
+.comment-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #202020;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+.comment-form button {
+  justify-self: start;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #a9c8ff;
+  color: #172033;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.comment-form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.thread-success {
+  color: #86efac;
+}
+
+.vote-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.vote-button {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #202020;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.vote-button:hover:not(:disabled) {
+  border-color: #a9c8ff;
+}
+
+.vote-button.active {
+  border-color: #a9c8ff;
+  background: #31415c;
+  color: #fff;
+}
+
+.vote-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Avatar dan informasi pemilik thread */
+.thread-author,
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.thread-author {
+  margin: 1rem 0 1.25rem;
+}
+
+.comment-author {
+  margin: 0.75rem 0;
+}
+
+.user-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid #d5dce7;
+  border-radius: 50%;
+  background: #e8edf5;
+  color: #24334d;
+  object-fit: cover;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.user-avatar-small {
+  width: 34px;
+  height: 34px;
+  font-size: 0.85rem;
+}
+
+.user-avatar-fallback {
+  background: #31415c;
+  color: #fff;
+}
+
+.thread-author-info,
+.comment-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.thread-author-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.thread-author-date {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+
+/* Navigasi halaman */
+.page-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-navigation a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.page-navigation a:hover {
+  text-decoration: underline;
+}
+
+/* Leaderboard */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.leaderboard-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #454545;
+  border-radius: 0.75rem;
+}
+
+.leaderboard-rank {
+  min-width: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.leaderboard-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.leaderboard-score {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.leaderboard-avatar-fallback[hidden] {
+  display: none;
+}
+
+
+/* Filter kategori */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.category-filter label {
+  font-weight: 600;
+}
+
+.category-filter select {
+  min-width: 180px;
+  max-width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #737373;
+  border-radius: 0.5rem;
+  background: #2b2b2b;
+  color: inherit;
+  font: inherit;
+}
+
+.category-reset-button {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #737373;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.category-reset-button:hover {
+  background: #3b3b3b;
+}
+
+.thread-category-label {
+  display: inline-block;
+  width: fit-content;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid #737373;
+  border-radius: 999px;
+  font-size: 0.85rem;
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthError, loginUser } from "../states/authSlice";
 
@@ -16,56 +16,78 @@ function LoginPage() {
     dispatch(clearAuthError());
 
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
-      navigate("/");
+      await dispatch(
+        loginUser({
+          email: email.trim(),
+          password,
+        }),
+      ).unwrap();
+
+      navigate("/", { replace: true });
     } catch {
       // Pesan error ditampilkan dari Redux Store.
     }
   };
 
   if (token) {
-    navigate("/");
+    return <Navigate to="/" replace />;
   }
 
   return (
     <main className="auth-page">
-      <section className="auth-card">
-        <p className="eyebrow">DICODING COMMUNITY</p>
-        <h1>Welcome back.</h1>
-        <p className="auth-description">
-          Masuk untuk melanjutkan percakapan dan berbagi ide.
-        </p>
+      <section className="auth-card" aria-labelledby="login-heading">
+        <Link to="/" className="auth-brand" aria-label="Kembali ke forum">
+          DICODING COMMUNITY
+        </Link>
+
+        <div className="auth-heading">
+          <p className="eyebrow">SELAMAT DATANG KEMBALI</p>
+          <h1 id="login-heading">Welcome back.</h1>
+          <p className="auth-description">
+            Masuk untuk melanjutkan percakapan dan berbagi ide.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="nama@email.com"
-            autoComplete="email"
-            required
-          />
+          <div className="auth-field">
+            <label htmlFor="login-email">Email</label>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="nama@email.com"
+              autoComplete="email"
+              required
+            />
+          </div>
 
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Minimal 6 karakter"
-            autoComplete="current-password"
-            required
-          />
+          <div className="auth-field">
+            <label htmlFor="login-password">Password</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Masukkan password"
+              autoComplete="current-password"
+              required
+            />
+          </div>
 
-          {error && (
+          {error ? (
             <p className="form-error" role="alert">
               {error}
             </p>
-          )}
+          ) : null}
 
-          <button type="submit" disabled={status === "loading"}>
+          <button
+            className="auth-submit"
+            type="submit"
+            disabled={status === "loading"}
+          >
             {status === "loading" ? "Memproses..." : "Login"}
           </button>
         </form>
@@ -73,6 +95,10 @@ function LoginPage() {
         <p className="auth-footer">
           Belum punya akun? <Link to="/register">Daftar sekarang</Link>
         </p>
+
+        <Link className="auth-back-link" to="/">
+          ← Kembali ke forum
+        </Link>
       </section>
     </main>
   );
