@@ -1,6 +1,7 @@
-import { useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useForm } from 'react-hook-form';
 import { clearAuthError, registerUser } from '../states/authSlice';
 
 function RegisterPage() {
@@ -8,12 +9,18 @@ function RegisterPage() {
   const navigate = useNavigate();
   const { status, error, token } = useSelector((state) => state.auth);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    register,
+    handleSubmit,
+  } = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const onSubmit = async ({ name, email, password }) => {
     dispatch(clearAuthError());
 
     try {
@@ -50,19 +57,20 @@ function RegisterPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <div className="auth-field">
             <label htmlFor="register-name">Nama</label>
             <input
               id="register-name"
-              name="name"
               type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
               placeholder="Nama lengkap"
               autoComplete="name"
               maxLength={50}
               required
+              {...register('name', {
+                required: true,
+                maxLength: 50,
+              })}
             />
           </div>
 
@@ -70,13 +78,13 @@ function RegisterPage() {
             <label htmlFor="register-email">Email</label>
             <input
               id="register-email"
-              name="email"
               type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
               placeholder="nama@email.com"
               autoComplete="email"
               required
+              {...register('email', {
+                required: true,
+              })}
             />
           </div>
 
@@ -84,14 +92,15 @@ function RegisterPage() {
             <label htmlFor="register-password">Password</label>
             <input
               id="register-password"
-              name="password"
               type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
               placeholder="Minimal 6 karakter"
               minLength={6}
               autoComplete="new-password"
               required
+              {...register('password', {
+                required: true,
+                minLength: 6,
+              })}
             />
             <span className="auth-hint">
               Gunakan minimal 6 karakter.
