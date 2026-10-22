@@ -46,4 +46,16 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ['cypress/e2e/**/*.cy.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.mocha,
+        expect: 'readonly',
+        Cypress: 'readonly',
+        cy: 'readonly',
+      },
+    },
+  },
 ]);
